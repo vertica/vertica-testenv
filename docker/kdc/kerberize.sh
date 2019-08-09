@@ -30,6 +30,10 @@ echo "[logging]
 ALTER DATABASE $NAME SET KerberosHostName = '${KHOST}';
 ALTER DATABASE $NAME SET KerberosRealm = '${REALM}';
 ALTER DATABASE $NAME SET KerberosKeytabFile = '${KTAB}';
+CREATE USER user1;
+CREATE AUTHENTICATION kerberos METHOD 'gss' HOST '0.0.0.0/0';
+ALTER AUTHENTICATION kerberos enable;
+GRANT AUTHENTICATION kerberos TO user1;
 eof
 
 chown dbadmin /vertica.keytab

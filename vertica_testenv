@@ -36,6 +36,15 @@ create_db(){
 	docker exec $VP_DB_NAME /kerberize.sh
 }
 
+create_sandbox(){
+	SANDBOX_NAME=${USER}.sandbox
+	docker build -t vertica/sandbox docker/sandbox
+	docker run --network=${NETWORK_NAME} -t -d --name=$SANDBOX_NAME vertica/sandbox
+	docker exec $SANDBOX_NAME /bin/sh -c "echo $(docker inspect -f "{{.NetworkSettings.Networks.${NETWORK_NAME}.IPAddress }}" $VP_KDC_NAME) kerberos.example.com >> /etc/hosts"
+	docker exec $SANDBOX_NAME /bin/sh -c "echo $(docker inspect -f "{{.NetworkSettings.Networks.${NETWORK_NAME}.IPAddress }}" $VP_DB_NAME) vertica vertica.example.com >> /etc/hosts"
+	docker exec -it $SANDBOX_NAME /bin/bash
+}
+
 create_test(){
 	# TODO: test_python sends whole packet to daemon. Mounting it would be faster and saves space.
 	if [[ $PYENV =~ ^py[0-9][0-9]$ ]]; then
@@ -124,6 +133,8 @@ op=$1
 if [ $op = 'start' ]; then
 	create_kdc
 	create_db
+elif [ $op = 'sandbox' ]; then
+	create_sandbox
 elif [ $op = 'test' ]; then
 	create_test
 elif [ $op = 'stop' ]; then
