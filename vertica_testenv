@@ -37,11 +37,10 @@ create_db(){
 }
 
 create_sandbox(){
-	SANDBOX_NAME=${USER}.sandbox
 	docker build -t vertica/sandbox docker/sandbox
 	docker run --network=${NETWORK_NAME} -t -d --name=$SANDBOX_NAME vertica/sandbox
 	docker exec $SANDBOX_NAME /bin/sh -c "echo $(docker inspect -f "{{.NetworkSettings.Networks.${NETWORK_NAME}.IPAddress }}" $VP_KDC_NAME) kerberos.example.com >> /etc/hosts"
-	docker exec $SANDBOX_NAME /bin/sh -c "echo $(docker inspect -f "{{.NetworkSettings.Networks.${NETWORK_NAME}.IPAddress }}" $VP_DB_NAME) vertica vertica.example.com >> /etc/hosts"
+	docker exec $SANDBOX_NAME /bin/sh -c "echo $(docker inspect -f "{{.NetworkSettings.Networks.${NETWORK_NAME}.IPAddress }}" $VP_DB_NAME) vertica.example.com vertica >> /etc/hosts"
 	docker exec -it $SANDBOX_NAME /bin/bash
 }
 
@@ -66,14 +65,17 @@ stop_containers(){
 	echo "Stopping containers"
 	docker container stop $VP_KDC_NAME
 	docker container stop $VP_DB_NAME
+	docker container stop $SANDBOX_NAME > /dev/null
 }
 
 clean_system(){
 	echo "Cleaning up"
 	docker container rm $VP_KDC_NAME
 	docker container rm $VP_DB_NAME
+	docker container rm $SANDBOX_NAME > /dev/null
 	docker image rm jbfavre/vertica
 	docker image rm vertica/kdc
+	docker image rm vertica/sandbox > /dev/null
 	docker network remove ${NETWORK_NAME}
 }
 
@@ -107,6 +109,7 @@ fi
 VP_KDC_NAME=$USER.kdc
 VP_DB_NAME=$USER.db
 NETWORK_NAME=${USER}test
+SANDBOX_NAME=${USER}.sandbox
 PYENV=py37
 while [ -n "$1" ]; do
 	case "$1" in
