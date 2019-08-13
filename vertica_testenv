@@ -51,9 +51,9 @@ create_test(){
 	cp docker/test/Dockerfile docker/test/Dockerfile.backup
 	sed -i "s/<ver>/$VER/g" docker/test/Dockerfile
 	sed -i "s/<toxenv>/$PYENV/g" docker/test/Dockerfile
-	KDC_ADDR=$(docker inspect -f "{{.NetworkSettings.Networks.$NETWORK_NAME.IPAddress }" $KDC_NAME)
-	DB_ADDR=$(docker inspect -f "{{.NetworkSettings.Networks.$NETWORK_NAME.IPAddress }" $DB_NAME)
-	docker build -f docker/test/Dockerfile -t vertica/test --build-arg kdc_addr=$KDC_ADDR ..
+	KDC_ADDR=$(docker inspect -f "{{.NetworkSettings.Networks.$NETWORK_NAME.IPAddress }}" $KDC_NAME)
+	DB_ADDR=$(docker inspect -f "{{.NetworkSettings.Networks.$NETWORK_NAME.IPAddress }}" $DB_NAME)
+	docker build -f docker/test/Dockerfile -t vertica/test --build-arg KDC_ADDR --build-arg DB_ADDR ..
 	docker run --network=$NETWORK_NAME --rm --name=vp.test vertica/test "-e $PYENV"
 
 	mv docker/test/Dockerfile.backup docker/test/Dockerfile	

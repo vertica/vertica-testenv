@@ -15,3 +15,6 @@ You can create a sandbox to play with by running `./vertica_testenv sandbox`. Th
 If you want to change the containers, they are labeled as `$USER.[kdc|db|sandbox]` and you can run `docker exec -it <container name> /bin/bash` on them.
 
 After you are done, stop the containers with `./vertica_testenv stop`. You can then reclaim disk space with `./vertica_testenv clean`.
+
+## vertica-python support
+Currently in development and encountering some directory-related bug. Will be done soon.
