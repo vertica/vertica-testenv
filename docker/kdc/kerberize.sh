@@ -35,8 +35,9 @@ CREATE AUTHENTICATION kerberos METHOD 'gss' HOST '0.0.0.0/0';
 ALTER AUTHENTICATION kerberos enable;
 GRANT AUTHENTICATION kerberos TO user1;
 eof
-
 chown dbadmin /vertica.keytab
+
+echo "Restarting Database to apply Kerbseros settings."
 /bin/su - dbadmin -c "/opt/vertica/bin/admintools -t stop_db -d $NAME"
 /bin/su - dbadmin -c "/opt/vertica/bin/admintools -t start_db -d $NAME"
 

@@ -1,5 +1,5 @@
 #! bin/sh
-KDC=kerberos.example.com
+KDC=$kdc_addr
 REALM=EXAMPLE.COM
 
 echo "[logging]
