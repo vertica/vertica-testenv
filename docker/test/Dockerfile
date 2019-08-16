@@ -1,9 +1,11 @@
-FROM python:3.7-alpine
+FROM python:<ver>-alpine
+ARG KDC_ADDR
+ARG DB_ADDR
 
-RUN apk add build-base krb5-dev
+RUN apk add build-base krb5 krb5-dev
 RUN pip install kerberos pytz python-dateutil tox
 COPY . /vp
-RUN ./kerberize.sh
 WORKDIR /vp
-RUN /bin/cp -f vertica-testenv/docker/test/tox.ini tox.ini
+RUN ./vertica-testenv/docker/test/kerberize.sh
 ENTRYPOINT ["tox"]
+# ENTRYPOINT ["/bin/sh"]

@@ -34,6 +34,9 @@ CREATE USER user1;
 CREATE AUTHENTICATION kerberos METHOD 'gss' HOST '0.0.0.0/0';
 ALTER AUTHENTICATION kerberos enable;
 GRANT AUTHENTICATION kerberos TO user1;
+CREATE AUTHENTICATION debug METHOD 'trust' HOST '0.0.0.0/0';
+ALTER AUTHENTICATION debug enable;
+GRANT AUTHENTICATION debug TO dbadmin;
 eof
 chown dbadmin /vertica.keytab
 

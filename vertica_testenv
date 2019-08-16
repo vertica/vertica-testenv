@@ -45,20 +45,21 @@ create_sandbox(){
 }
 
 create_test(){
-	# TODO
+	# Process python version
 	if [[ $PYENV =~ ^py[0-9][0-9]$ ]]; then
 	VER=${PYENV:2:1}.${PYENV:3}
-
-	cp docker/test/Dockerfile docker/test/Dockerfile.backup
-	sed -i "s/<ver>/$VER/g" docker/test/Dockerfile
-	sed -i "s/<toxenv>/$PYENV/g" docker/test/Dockerfile
+	cp $SRC/docker/test/Dockerfile $SRC/docker/test/Dockerfile.backup
+	sed -i "s/<ver>/$VER/g" $SRC/docker/test/Dockerfile
 	KDC_ADDR=$(docker inspect -f "{{.NetworkSettings.Networks.$NETWORK_NAME.IPAddress }}" $KDC_NAME)
 	DB_ADDR=$(docker inspect -f "{{.NetworkSettings.Networks.$NETWORK_NAME.IPAddress }}" $DB_NAME)
-	docker build -f docker/test/Dockerfile -t vertica/test --build-arg KDC_ADDR --build-arg DB_ADDR ..
-	docker run --network=$NETWORK_NAME --rm --name=vp.test vertica/test "-e $PYENV"
+	
+	# Set up testing
+	docker build -f $SRC/docker/test/Dockerfile -t vertica/test --build-arg KDC_ADDR=$KDC_ADDR --build-arg DB_ADDR=$DB_ADDR $SRC/..
+	docker run --network=$NETWORK_NAME --rm --name=$TESTER_NAME vertica/test "-e $PYENV"
 
+	# cleanup
 	mv docker/test/Dockerfile.backup docker/test/Dockerfile	
-	docker image rm vertica/test
+	# docker image rm vertica/test
 	else echo "Invalid python environment."
 	fi
 }
@@ -110,6 +111,7 @@ fi
 
 KDC_NAME=$USER.kdc
 DB_NAME=$USER.db
+TESTER_NAME=$USER.test
 NETWORK_NAME=${USER}test
 SANDBOX_NAME=${USER}.sandbox
 PYENV=py37
