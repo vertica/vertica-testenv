@@ -4,7 +4,7 @@ KHOST=vertica.example.com
 KSN=vertica
 REALM=EXAMPLE.COM
 KTAB=/vertica.keytab
-NAME=docker
+DBNAME=docker
 
 echo "[logging]
  default = FILE:/var/log/krb5libs.log
@@ -27,9 +27,9 @@ echo "[logging]
  example.com = $REALM" | tee /etc/krb5.conf
 
 /opt/vertica/bin/vsql -U dbadmin -a << eof
-ALTER DATABASE $NAME SET KerberosHostName = '${KHOST}';
-ALTER DATABASE $NAME SET KerberosRealm = '${REALM}';
-ALTER DATABASE $NAME SET KerberosKeytabFile = '${KTAB}';
+ALTER DATABASE $DBNAME SET KerberosHostName = '${KHOST}';
+ALTER DATABASE $DBNAME SET KerberosRealm = '${REALM}';
+ALTER DATABASE $DBNAME SET KerberosKeytabFile = '${KTAB}';
 CREATE USER user1;
 CREATE AUTHENTICATION kerberos METHOD 'gss' HOST '0.0.0.0/0';
 ALTER AUTHENTICATION kerberos enable;
@@ -38,7 +38,7 @@ eof
 chown dbadmin /vertica.keytab
 
 echo "Restarting Database to apply Kerbseros settings."
-/bin/su - dbadmin -c "/opt/vertica/bin/admintools -t stop_db -d $NAME"
-/bin/su - dbadmin -c "/opt/vertica/bin/admintools -t start_db -d $NAME"
+/bin/su - dbadmin -c "/opt/vertica/bin/admintools -t stop_db -d $DBNAME"
+/bin/su - dbadmin -c "/opt/vertica/bin/admintools -t start_db -d $DBNAME"
 
 /opt/vertica/bin/vsql -U dbadmin -a -c "SELECT kerberos_config_check();"
