@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 create_kdc(){
 	echo "Setting up KDC"
