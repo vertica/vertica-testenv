@@ -56,10 +56,11 @@ create_test(){
 	# Set up testing
 	docker build -f $SRC/docker/test/Dockerfile -t vertica/test --build-arg KDC_ADDR=$KDC_ADDR --build-arg DB_ADDR=$DB_ADDR $SRC/..
 	docker run --network=$NETWORK_NAME --rm --name=$TESTER_NAME vertica/test "-e $PYENV"
-
+	RESULT=$?
 	# cleanup
 	mv docker/test/Dockerfile.backup docker/test/Dockerfile	
-	# docker image rm vertica/test
+	docker image rm vertica/test
+	exit $RESULT
 	else echo "Invalid python environment."
 	fi
 }
